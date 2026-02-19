@@ -1,3 +1,4 @@
+import { Route, Routes } from "react-router";
 import { LevelCard } from "~/components/levelCard";
 
 const levels = [
@@ -21,14 +22,13 @@ const levels = [
 export function Welcome() {
   return (
     <>
-      <div className="text-2xl font-bold text-center">Canary Type</div>
-      {levels.map(level => (
-        <LevelCard
-          title = {level.title}
-          levelNum = {level.levelNum}
-          description = {level.description}
-        />
-      ))}
+      <main className="text-2xl font-bold text-center">Canary Type</main>
+      <h2 className="text-lg text-center">The typing gauntlet</h2>
+      {levels.map(level => {
+        return (
+          <a href={`/level/${level.levelNum}`} key={level.levelNum} className="block mt-4 group">{level.title}</a>
+        )
+      })}
     </>
   );
 }
