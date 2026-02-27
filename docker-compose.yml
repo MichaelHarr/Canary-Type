@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  postgres:
+  postgres-db:
     image: postgres:16
     container_name: ktor-postgres
     environment:
@@ -12,6 +12,20 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d
+
+  backend:
+    build: ./ktor
+    container_name: app-backend
+    environment:
+      DB_HOST: postgres-db
+      DB_PORT: 5432
+      DB_NAME: ktor_tutorial_db
+      DB_PASSWORD: postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres-db
 
 volumes:
   postgres_data:
