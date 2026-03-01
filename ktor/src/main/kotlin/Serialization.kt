@@ -1,6 +1,7 @@
 package com.canary
 
 import com.canary.repository.LevelRepository
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -26,6 +27,12 @@ fun Application.configureSerialization(repository: LevelRepository) {
         val levelNum = call.parameters["levelNum"]
 
         val level = repository.getLevelByLevelNumber(levelNum)
+
+        if (level != null) {
+          call.respond(level)
+        } else {
+          call.respond(HttpStatusCode.NotFound)
+        }
       }
     }
   }
