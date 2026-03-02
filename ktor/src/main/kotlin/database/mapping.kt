@@ -12,7 +12,7 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 object LevelTable : IntIdTable("level") {
   val name = varchar("name", 50)
   val number = varchar("number", 50)
-  val typingText = varchar("description", 50)
+  val typingText = varchar("typingtext", 50)
 }
 
 class LevelDAO(id: EntityID<Int>): IntEntity(id) {
@@ -20,7 +20,7 @@ class LevelDAO(id: EntityID<Int>): IntEntity(id) {
 
   var name by LevelTable.name
   var number by LevelTable.number
-  var description by LevelTable.typingText
+  var typingText by LevelTable.typingText
 }
 
 suspend fun <T> suspendTransaction(block: Transaction.() -> T): T =
@@ -29,6 +29,6 @@ suspend fun <T> suspendTransaction(block: Transaction.() -> T): T =
 fun daoToModel(dao: LevelDAO) = Level(
   num = dao.number.toInt(),
   name = dao.name,
-  typingText = dao.description
+  typingText = dao.typingText
 )
 

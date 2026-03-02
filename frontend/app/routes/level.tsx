@@ -4,22 +4,28 @@ import type { Route } from "./+types/level";
 export async function loader({ params } : Route.LoaderArgs) {
     
     const response = await fetch(
-        `https://localhost:8080/levels/byNum/${params.levelNum}`
+        `http://backend:8080/levels/byNum/${params.levelNum}`
     );
 
     if (!response.ok) {
         throw new Response("Failed to fetch level data", { status: 500 });
     }
 
-    console.log("Response data:", response.json());
+    const data = await response.json();
+    console.log("Response data:", data);
 
-    return response.json();
+    return data;
 }
 
 export default function level({
     loaderData,
 }: Route.ComponentProps) {
     let params = useParams()
-    console.log(params)
-    return <h1>Level {params.levelNum}</h1>;
+    console.log(loaderData);
+    return (
+    <>
+        <h1>Level {params.levelNum}</h1>
+        <h2>Hello</h2>
+    </>
+    );
 }
