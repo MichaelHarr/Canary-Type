@@ -25,7 +25,6 @@ export async function loader({ params } : Route.LoaderArgs): Promise<LevelData> 
 }
 
 export default function Level() {
-    const params = useParams();
     const loaderData = useLoaderData() as LevelData;
     const characters = loaderData.typingText.split("") ?? [];
     const [currentIndex, setCurrentIndex] = useState(0);

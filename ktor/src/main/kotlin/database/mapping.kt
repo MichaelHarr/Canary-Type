@@ -1,6 +1,6 @@
 package com.canary.database
 
-import com.canary.model.Level
+import com.canary.features.level.Level
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
@@ -27,8 +27,8 @@ suspend fun <T> suspendTransaction(block: Transaction.() -> T): T =
   newSuspendedTransaction(Dispatchers.IO, statement = block)
 
 fun daoToModel(dao: LevelDAO) = Level(
-  num = dao.number.toInt(),
   name = dao.name,
-  typingText = dao.typingText
+  number = dao.number.toInt(),
+  text = dao.typingText
 )
 

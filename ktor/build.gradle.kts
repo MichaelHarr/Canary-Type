@@ -29,7 +29,9 @@ dependencies {
     implementation(libs.ktor.server.status.pages)
     implementation(libs.ktor.content.negotiation)
     implementation(libs.ktor.json)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation(platform("io.insert-koin:koin-bom:4.2.0"))
+    implementation("io.insert-koin:koin-ktor")
+    implementation("io.insert-koin:koin-logger-slf4j")
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }
