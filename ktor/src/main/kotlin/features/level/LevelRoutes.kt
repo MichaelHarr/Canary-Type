@@ -9,8 +9,8 @@ fun Route.levelRoutes() {
 
     route("/levels") {
       get("/") {
-        levelService.getAll()
-        call.respond("Get all levels")
+        val levels: List<Level> = levelService.getAll()
+        call.respond("All Levels: $levels")
       }
 
       get("/{id}") {

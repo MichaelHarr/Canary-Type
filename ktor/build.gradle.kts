@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
+    alias(libs.plugins.koin.compiler)
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0"
 }
 
@@ -32,6 +33,7 @@ dependencies {
     implementation(platform("io.insert-koin:koin-bom:4.2.0"))
     implementation("io.insert-koin:koin-ktor")
     implementation("io.insert-koin:koin-logger-slf4j")
+    implementation(libs.koin.annotations)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }
