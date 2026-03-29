@@ -3,15 +3,15 @@ import type { Route } from "./+types/level";
 import { useEffect, useState, useRef } from "react";
 
 type LevelData = {
-    num: number;
     name: string;
-    typingText: string;
+    num: number;
+    text: string;
 }
 
 export async function loader({ params } : Route.LoaderArgs): Promise<LevelData> {
     
     const response = await fetch(
-        `http://localhost:8080/levels/byNum/${params.levelNum}`
+        `http://localhost:8080/levels/${params.levelNum}`
     );
 
     if (!response.ok) {
@@ -26,7 +26,7 @@ export async function loader({ params } : Route.LoaderArgs): Promise<LevelData> 
 
 export default function Level() {
     const loaderData = useLoaderData() as LevelData;
-    const characters = loaderData.typingText.split("") ?? [];
+    const characters = loaderData.text.split("") ?? [];
     const [currentIndex, setCurrentIndex] = useState(0);
     const [currentChar, setCurrentChar] = useState(characters[0] ?? "");
     const [lastKey, setLastKey] = useState("");
@@ -36,7 +36,7 @@ export default function Level() {
     useEffect(() => {
         setCurrentIndex(0);
         setCurrentChar(characters[0] ?? "");
-    }, [loaderData.typingText]);
+    }, [loaderData.text]);
 
     useEffect(() => {
         setSeconds(60);
@@ -64,7 +64,7 @@ export default function Level() {
                 intervalRef.current = null;
             }
         };
-    }, [loaderData.typingText]);
+    }, [loaderData.text]);
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {

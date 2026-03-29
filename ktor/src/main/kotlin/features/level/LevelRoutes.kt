@@ -1,4 +1,6 @@
 package com.canary.features.level
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
@@ -10,11 +12,22 @@ fun Route.levelRoutes() {
     route("/levels") {
       get("/") {
         val levels: List<Level> = levelService.getAll()
-        call.respond("All Levels: $levels")
+        call.respond(levels)
       }
 
       get("/{id}") {
-        call.respond("Get level by id")
+        val id: Int? = call.parameters["id"]?.toIntOrNull()
+        if (id == null) {
+          call.respond(HttpStatusCode.BadRequest, "Invalid or missing id")
+          return@get
+        }
+
+        try {
+          val level: Level = levelService.get(id)
+          call.respond(level)
+        } catch (e: NotFoundException) {
+          call.respond(HttpStatusCode.NotFound, "Level with id $id not found")
+        }
       }
     }
 }
