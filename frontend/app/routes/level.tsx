@@ -1,4 +1,4 @@
-import { useParams, useLoaderData } from "react-router";
+import { useParams, useLoaderData, useNavigate } from "react-router";
 import type { Route } from "./+types/level";
 import { useEffect, useState, useRef } from "react";
 
@@ -18,28 +18,38 @@ export async function loader({ params } : Route.LoaderArgs): Promise<LevelData> 
         throw new Response("Failed to fetch level data", { status: 500 });
     }
 
-    const data: LevelData = await response.json();
-    console.log("Response data:", data);
+    const raw = await response.json();
+    console.log("Response data:", raw);
+
+    const data: LevelData = {
+        name: raw.name,
+        num: raw.number ?? raw.num,
+        text: raw.text,
+    };
 
     return data;
 }
 
 export default function Level() {
     const loaderData = useLoaderData() as LevelData;
+    const navigate = useNavigate();
     const characters = loaderData.text.split("") ?? [];
     const [currentIndex, setCurrentIndex] = useState(0);
     const [currentChar, setCurrentChar] = useState(characters[0] ?? "");
     const [lastKey, setLastKey] = useState("");
-    const [seconds, setSeconds] = useState(60);
+    const [seconds, setSeconds] = useState(10);
     const intervalRef = useRef<number | null>(null);
+    const [status, setStatus] = useState<"playing" | "success" | "failed">("playing");
 
     useEffect(() => {
         setCurrentIndex(0);
         setCurrentChar(characters[0] ?? "");
+        setStatus("playing");
     }, [loaderData.text]);
 
     useEffect(() => {
-        setSeconds(60);
+        setSeconds(10);
+        setStatus("playing");
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
@@ -67,7 +77,22 @@ export default function Level() {
     }, [loaderData.text]);
 
     useEffect(() => {
+        if (seconds === 0) {
+            if (currentIndex >= characters.length) {
+                setStatus("success");
+            } else {
+                setStatus("failed");
+            }
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+        }
+    }, [seconds, currentIndex, characters.length]);
+
+    useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
+            if (status !== "playing") return;
             setLastKey(event.key);
             if (!currentChar) return;
             if (event.key === currentChar) {
@@ -76,8 +101,12 @@ export default function Level() {
                 if (nextIndex < characters.length) {
                     setCurrentChar(characters[nextIndex]);
                 } else {
-                    // Level complete, clear currentChar
                     setCurrentChar("");
+                    setStatus("success");
+                    if (intervalRef.current) {
+                        clearInterval(intervalRef.current);
+                        intervalRef.current = null;
+                    }
                 }
             }
         };
@@ -95,6 +124,14 @@ export default function Level() {
             </div>
             <div className="w-full max-w-4xl text-center">
                 <h1 className="text-lg text-gray-500 mb-6">Level {loaderData.num}</h1>
+                <div className="mb-4">
+                    <button
+                        onClick={() => navigate('/')}
+                        className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                    >
+                        Back
+                    </button>
+                </div>
                 <p className="text-4xl md:text-6xl font-semibold leading-tight whitespace-nowrap max-w-full">
                     {characters.map((char, index) => {
                         const distance = index - currentIndex;
@@ -126,6 +163,31 @@ export default function Level() {
                         );
                     })}
                 </p>
+                {status !== "playing" && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
+                        <div className="bg-white rounded-lg p-8 shadow-lg text-center max-w-md mx-4">
+                            {status === "success" ? (
+                                <>
+                                    <h2 className="text-2xl font-bold text-green-600 mb-2">Success!</h2>
+                                    <p className="mb-4">You finished the level.</p>
+                                </>
+                            ) : (
+                                <>
+                                    <h2 className="text-2xl font-bold text-red-600 mb-2">Time's up</h2>
+                                    <p className="mb-4">You failed to finish typing in time.</p>
+                                </>
+                            )}
+                            <div className="flex justify-center gap-4">
+                                <button
+                                    onClick={() => navigate('/')}
+                                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                                >
+                                    Back to Home
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
